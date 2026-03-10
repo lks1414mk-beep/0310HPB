@@ -289,7 +289,7 @@ background-position:400%
 
 <p style="font-size:22px;">楽しい一年になりますように…！</p>
 
-<button class="neonButton" onclick="celebrate()">
+<button id="celebrateBtn" class="neonButton" onclick="celebrate()">
 
 おめでとおおおおおおおおお！！！！
 
@@ -416,7 +416,7 @@ document.getElementById("sound").play();
 
 celebrateLevel++;
 
-let btn = document.querySelector(".neonButton");
+let btn = document.getElementById("celebrateBtn");
 
 btn.innerText =
 celebrateMessages[
