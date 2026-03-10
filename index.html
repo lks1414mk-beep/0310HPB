@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>さのちゃん へ</title>
+
+<meta property="og:title" content="まじで怪しいURLではありません">
+<meta property="og:description" content="ややこしくてすません…開いてみて…">
+<meta property="og:image" content="">
+
+<style>
+
+body{
+margin:0;
+font-family:sans-serif;
+text-align:center;
+background:#000;
+color:white;
+overflow:hidden;
+
+font-size:0.8em;
+}
+
+/* 最初の画面 */
+
+#startScreen{
+margin-top:35vh;
+}
+
+button{
+padding:12px 20px;
+font-size:18px;
+border-radius:10px;
+border:none;
+}
+
+/* カウント */
+
+#countdown{
+display:none;
+font-size:90px;
+margin-top:35vh;
+font-weight:bold;
+}
+
+/* フラッシュ */
+
+#flash{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:white;
+opacity:0;
+pointer-events:none;
+transition:opacity .2s;
+}
+
+/* ネオン画面 */
+
+#neonScreen{
+
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+
+opacity:0;
+pointer-events:none;
+
+transition:opacity 1.5s ease;
+
+background:radial-gradient(circle,#111 0%,#000 80%);
+}
+
+#neonScreen.active{
+opacity:1;
+pointer-events:auto;
+}
+
+/* ステージ */
+
+.stage{
+
+position:absolute;
+bottom:0;
+width:100%;
+height:35%;
+
+background:linear-gradient(
+to top,
+#111,
+transparent
+);
+
+box-shadow:
+0 -20px 60px rgba(255,255,255,0.2);
+
+}
+
+/* タイトル */
+
+.neonTitle{
+
+margin-top:8vh;
+
+font-size:7vw;
+
+font-weight:bold;
+
+background:linear-gradient(
+90deg,
+red,
+orange,
+yellow,
+lime,
+cyan,
+blue,
+violet,
+red
+);
+
+background-size:400%;
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+animation:rainbowMove 6s linear infinite;
+
+text-shadow:
+0 0 10px rgba(255,255,255,.7),
+0 0 20px rgba(255,255,255,.5),
+0 0 40px rgba(255,255,255,.3);
+
+}
+
+/* ボタン */
+
+.neonButton{
+
+margin-top:30px;
+
+padding:15px 30px;
+
+font-size:20px;
+
+border:2px solid #00ffff;
+
+background:transparent;
+
+color:#00ffff;
+
+border-radius:12px;
+
+box-shadow:
+0 0 10px #00ffff,
+0 0 20px #00ffff;
+
+}
+
+/* キラキラ */
+
+.sparkle{
+
+position:absolute;
+width:4px;
+height:4px;
+background:white;
+border-radius:50%;
+
+animation:sparkleMove 4s linear infinite;
+
+}
+
+@keyframes sparkleMove{
+
+0%{
+transform:translateY(-100vh);
+opacity:0;
+}
+
+50%{
+opacity:1;
+}
+
+100%{
+transform:translateY(100vh);
+opacity:0;
+}
+
+}
+
+/* クラッカー */
+
+.cracker{
+
+position:absolute;
+
+width:10px;
+height:6px;
+
+border-radius:2px;
+
+animation:crackerBurst 1.2s ease-out forwards;
+
+}
+
+@keyframes crackerBurst{
+
+0%{
+transform:translate(0,0) rotate(0deg);
+opacity:1;
+}
+
+100%{
+transform:translate(var(--x),var(--y)) rotate(720deg);
+opacity:0;
+}
+
+}
+
+.confetti{
+
+position:absolute;
+
+width:8px;
+height:8px;
+
+border-radius:2px;
+
+animation:confettiFall 3s linear forwards;
+
+}
+
+@keyframes confettiFall{
+
+0%{
+transform:translateY(-10vh) rotate(0deg);
+}
+
+100%{
+transform:translateY(110vh) rotate(720deg);
+}
+
+}
+
+@keyframes rainbowMove{
+
+0%{
+background-position:0%
+}
+
+100%{
+background-position:400%
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="startScreen">
+
+<h2>本日のお誕生日様でしょうか？</h2>
+
+<button onclick="startCountdown()">Yes</button>
+<button onclick="startCountdown()">Yes</button>
+<button onclick="startCountdown()">本当にYes？</button>
+<button onclick="startCountdown()">Yes</button>
+<button onclick="startCountdown()">Yes</button>
+
+</div>
+
+<div id="countdown"></div>
+
+<div id="flash"></div>
+
+<!-- ネオン画面 -->
+
+<div id="neonScreen">
+
+<h1 class="neonTitle">🎉 HAPPY BIRTHDAY 🎉</h1>
+<h1 class="neonTitle">さのちゃん</h1>
+
+<p style="font-size:22px;">楽しい一年になりますように…！</p>
+
+<button class="neonButton" onclick="celebrate()">
+
+おめでとおおおおおおおおお！！！！
+
+</button>
+
+<div class="stage"></div>
+
+</div>
+
+<audio id="sound"
+src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8b5b5b6f3b.mp3?filename=party-horn-6983.mp3">
+</audio>
+
+<script>
+
+  let celebrateLevel = 0;
+
+const celebrateMessages = [
+
+"おめでとおおおおおおおおお！！！！",
+"もう一回祝う",
+"おめええええええええ",
+"スマホ振ってみて",
+"祝うのを絶対にやめない",
+"もういい？",
+"でも祝います",
+"🎉🎉🎉🎉🎉"
+
+];
+
+/* カウントダウン */
+
+function startCountdown(){
+
+enableShake();
+
+document.getElementById("startScreen").style.display="none";
+
+let countdown=document.getElementById("countdown");
+
+countdown.style.display="block";
+
+let count=3;
+
+countdown.innerText=count;
+
+let interval=setInterval(()=>{
+
+count--;
+
+if(count>0){
+
+countdown.innerText=count;
+
+}else{
+
+clearInterval(interval);
+
+countdown.style.display="none";
+
+flashAndShow();
+
+}
+
+},1000);
+
+}
+
+
+
+/* キラキラ生成 */
+
+function launchConfetti(){
+
+for(let i=0;i<120;i++){
+
+let c=document.createElement("div");
+
+c.className="confetti";
+
+c.style.left=Math.random()*100+"vw";
+
+c.style.background=
+`hsl(${Math.random()*360},100%,60%)`;
+
+document.body.appendChild(c);
+
+setTimeout(()=>{
+c.remove();
+},3000);
+
+}
+
+}
+
+function createSparkles(){
+
+for(let i=0;i<80;i++){
+
+let s=document.createElement("div");
+
+s.className="sparkle";
+
+s.style.left=Math.random()*100+"vw";
+
+s.style.top=Math.random()*100+"vh";
+
+s.style.animationDelay=Math.random()*4+"s";
+
+document.body.appendChild(s);
+
+}
+
+}
+
+
+/* クラッカー */
+
+function celebrate(){
+
+document.getElementById("sound").play();
+
+/* ボタンメッセージ進化 */
+
+celebrateLevel++;
+
+let btn = document.querySelector(".neonButton");
+
+btn.innerText =
+celebrateMessages[
+celebrateLevel % celebrateMessages.length
+];
+
+/* クラッカー */
+
+let originX = window.innerWidth / 2;
+let originY = window.innerHeight * 0.6;
+
+for(let i=0;i<120;i++){
+
+let paper=document.createElement("div");
+
+paper.className="cracker";
+
+paper.style.left=originX+"px";
+paper.style.top=originY+"px";
+
+paper.style.background=
+`hsl(${Math.random()*360},100%,60%)`;
+
+paper.style.setProperty("--x",(Math.random()-0.5)*600+"px");
+paper.style.setProperty("--y",(Math.random()-1)*600+"px");
+
+document.body.appendChild(paper);
+
+setTimeout(()=>{
+paper.remove();
+},1200);
+
+}
+
+}
+
+let lastShake = 0;
+
+window.addEventListener("devicemotion", e => {
+
+let acc = e.accelerationIncludingGravity;
+
+if(!acc) return;
+
+let power =
+Math.abs(acc.x) +
+Math.abs(acc.y) +
+Math.abs(acc.z);
+
+if(power > 35){
+
+let now = Date.now();
+
+if(now - lastShake > 1500){
+
+launchConfetti();
+celebrate();
+
+lastShake = now;
+
+}
+
+}
+
+});
+
+function flashAndShow(){
+
+let flash = document.getElementById("flash");
+
+flash.style.opacity = "1";
+
+setTimeout(()=>{
+
+flash.style.opacity = "0";
+
+document
+.getElementById("neonScreen")
+.classList
+.add("active");
+
+createSparkles();
+
+},120);
+
+}
+
+function enableShake(){
+
+if(typeof DeviceMotionEvent !== "undefined" &&
+typeof DeviceMotionEvent.requestPermission === "function"){
+
+DeviceMotionEvent.requestPermission()
+.then(permissionState=>{
+if(permissionState === "granted"){
+console.log("shake enabled");
+}
+})
+.catch(console.error);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
